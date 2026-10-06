@@ -955,16 +955,27 @@ else
     end
 end
 
---═══════════════ ALL SCRIPTS TAB (full library) ═══════════════
+--═══════════════ ALL SCRIPTS TAB (full library, compatible first) ═══════════════
 tabAllScripts:Paragraph({
     Title = "Script Library",
     Desc = #SCRIPTS .. (#SCRIPTS == 1 and " script total" or " scripts total"),
     Icon = "folder-open",
 })
+local ordered = {}
 for _, s in ipairs(SCRIPTS) do
+    if s.game == "universal" or s.game == game.PlaceId then table.insert(ordered, s) end
+end
+for _, s in ipairs(SCRIPTS) do
+    if not (s.game == "universal" or s.game == game.PlaceId) then table.insert(ordered, s) end
+end
+for _, s in ipairs(ordered) do
+    local tag
+    if s.game == game.PlaceId then tag = "\226\156\147 This game"
+    elseif s.game == "universal" then tag = "Universal"
+    else tag = "Place " .. tostring(s.game) end
     tabAllScripts:Button({
         Title = s.name,
-        Desc = s.desc .. "  ·  " .. (s.game == "universal" and "Universal" or ("Place " .. tostring(s.game))),
+        Desc = s.desc .. "  \194\183  " .. tag,
         Icon = "play",
         Callback = function() runScript(s) end,
     })
