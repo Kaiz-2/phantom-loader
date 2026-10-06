@@ -165,8 +165,8 @@ local function createLootLabsLink(destinationUrl)
     local okJ, data = pcall(function()
         return HttpService:JSONDecode(res.Body)
     end)
-    if not okJ or type(data) ~= "table" or not data.message then return nil end
-    return data.message.loot_url
+    if not okJ or type(data) ~= "table" or type(data.message) ~= "table" or not data.message[1] then return nil end
+    return data.message[1].loot_url
 end
 
 local function createWorkinkOverride(baseUrl, destinationUrl)
