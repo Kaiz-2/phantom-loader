@@ -933,12 +933,19 @@ local tabSettings = Window:Tab({
 local function runScript(s)
     WindUI:Notify({ Title = "Phantom", Content = "Loading " .. s.name .. "...", Duration = 2, Icon = "download" })
     local ok, err = pcall(function()
-        return loadstring(game:HttpGet(s.url))()
+        local src = game:HttpGet(s.url)
+        if type(src) ~= "string" or #src == 0 then error("empty response", 0) end
+        local fn, lerr = loadstring(src)
+        if not fn then error(lerr or "compile error", 0) end
+        return fn()
     end)
     if ok then
-        WindUI:Notify({ Title = "Phantom", Content = s.name .. " loaded", Duration = 3, Icon = "check" })
+        WindUI:Notify({ Title = "Phantom", Content = s.name .. " loaded — closing hub", Duration = 3, Icon = "check" })
+        -- script executed: tear down Phantom so only the loaded script's UI remains
+        task.wait(0.6)
+        pcall(function() Window:Destroy() end)
     else
-        WindUI:Notify({ Title = "Phantom", Content = "Failed: " .. tostring(err):sub(1, 60), Duration = 5, Icon = "x" })
+        WindUI:Notify({ Title = "Phantom", Content = "Failed: " .. tostring(err):sub(1, 70), Duration = 5, Icon = "x" })
     end
 end
 
@@ -1098,7 +1105,7 @@ end
 
 tabSettings:Paragraph({
     Title = "HWID",
-    Desc = HWID:sub(1, 28) .. "...",
+    Desc = (#HWID > 28 and (HWID:sub(1, 28) .. "...") or HWID),
     Icon = "fingerprint",
 })
 
@@ -1167,7 +1174,29 @@ tabSettings:Button({
                     Variant = "Primary",
                     Callback = function()
                         pcall(function()
-                            game:GetService("TeleportService"):Teleport(game.PlaceId)
+                            local TS = game:GetService("TeleportService")
+                            local hopped = false
+                            if httpReq then
+                                local ok, res = pcall(function()
+                                    return httpReq({ Url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100", Method = "GET" })
+                                end)
+                                if ok and res and res.Body then
+                                    local okJ, data = pcall(function() return HttpService:JSONDecode(res.Body) end)
+                                    if okJ and data and data.data then
+                                        local pool = {}
+                                        for _, srv in ipairs(data.data) do
+                                            if srv.id ~= game.JobId and (srv.playing or 0) < (srv.maxPlayers or 0) then
+                                                table.insert(pool, srv.id)
+                                            end
+                                        end
+                                        if #pool > 0 then
+                                            TS:TeleportToPlaceInstance(game.PlaceId, pool[math.random(1, #pool)])
+                                            hopped = true
+                                        end
+                                    end
+                                end
+                            end
+                            if not hopped then TS:Teleport(game.PlaceId) end
                         end)
                     end,
                 },
