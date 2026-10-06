@@ -37,18 +37,35 @@ local CFG = {
 --═══════════════ SCRIPT LIBRARY ═══════════════
 -- game = "universal" (shows everywhere) or a placeId (shows only in that game)
 local SCRIPTS = {
-    {
-        name = "Infinite Yield",
-        desc = "Admin command suite",
-        game = "universal",
-        url  = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source",
-    },
-    {
-        name = "Blue Lock Farm",
-        desc = "Auto-farm for Blue Lock",
-        game = 132767904294856,
-        url  = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source",
-    },
+    { name = "Infinite Yield", desc = "Admin command suite", game = "universal",
+      url = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source" },
+
+    -- Verified on ScriptBlox (published by verified users). "key" = needs its own key.
+    { name = "Blox Fruits", desc = "Cash generator - keyless", game = 2753915549,
+      url = "https://rawscripts.net/raw/XMAS-Blox-Fruits-Cash-Generator-OPEN-SOURCE-and-KEYLESS-25553" },
+    { name = "Pet Simulator 99", desc = "ZapHub - needs key", game = 8737899170,
+      url = "https://rawscripts.net/raw/18h-Pet-Simulator-99!-ZapHub-The-BEST-Auto-Farm-and-MORE-10049" },
+    { name = "Fisch", desc = "Blackhub - needs key", game = 16732694052,
+      url = "https://rawscripts.net/raw/Fisch-Blackhub-Best-Undetected-Script-53591" },
+    { name = "Steal a Brainrot", desc = "Undetected - needs key", game = 109983668079237,
+      url = "https://rawscripts.net/raw/Steal-a-Brainrot-UNDETECTED-SAB-216841" },
+    { name = "99 Nights in the Forest", desc = "Neox Hub - needs key", game = 79546208627805,
+      url = "https://rawscripts.net/raw/99-Nights-in-the-Forest-New-Neox-Hub-Script-With-Most-Features-43425" },
+    { name = "Brookhaven RP", desc = "Sander XY - needs key", game = 4924922222,
+      url = "https://rawscripts.net/raw/Brookhaven-RP-Sander-XY-35845" },
+    { name = "Murder Mystery 2", desc = "Free script - needs key", game = 142823291,
+      url = "https://rawscripts.net/raw/Murder-Mystery-2-The-best-free-script-lots-of-features-202764" },
+    { name = "Adopt Me", desc = "Snowy Hub - needs key", game = 920587237,
+      url = "https://rawscripts.net/raw/Adopt-Me!-Snowy-Hub-Auto-Farm-Auto-Hatch-Auto-Age-More-240470" },
+    { name = "Bee Swarm Simulator", desc = "Kron Hub - needs key", game = 1537690962,
+      url = "https://rawscripts.net/raw/Bee-Swarm-Simulator-Kron-Hub-20936" },
+    { name = "Blade Ball", desc = "Project Stark - needs key", game = 13772394625,
+      url = "https://rawscripts.net/raw/Blade-Ball-Project-Stark-Free-Hub-59919" },
+    { name = "Dress to Impress", desc = "Snowy Hub - needs key", game = 15101393044,
+      url = "https://rawscripts.net/raw/Dress-To-Impress-Snowy-Hub-or-Auto-Farm-Troll-Speed-Anti-AFK-Fling-and-More-225635" },
+
+    { name = "Blue Lock Farm", desc = "Auto-farm", game = 132767904294856,
+      url = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source" },
 }
 
 --═══════════════ SERVICES ═══════════════
