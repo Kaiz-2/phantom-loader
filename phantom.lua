@@ -267,17 +267,34 @@ local function showKeyGate()
         error    = Color3.fromRGB(230, 70, 70),
     }
 
+    local overlay = Instance.new("Frame")
+    overlay.Size = UDim2.fromScale(1, 1)
+    overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    overlay.BackgroundTransparency = 0.4
+    overlay.BorderSizePixel = 0
+    overlay.Parent = gui
+
     local bg = Instance.new("Frame")
-    bg.Size = UDim2.fromScale(1, 1)
+    bg.Size = UDim2.new(0, 450, 0, 0)
+    bg.AutomaticSize = Enum.AutomaticSize.Y
+    bg.Position = UDim2.fromScale(0.5, 0.5)
+    bg.AnchorPoint = Vector2.new(0.5, 0.5)
     bg.BackgroundColor3 = COL.bg
     bg.BackgroundTransparency = 0
     bg.BorderSizePixel = 0
     bg.Parent = gui
+    makeCorner(bg, 14)
+    makeStroke(bg, COL.border)
+
+    local bgPad = Instance.new("UIPadding")
+    bgPad.PaddingLeft = UDim.new(0, 28)
+    bgPad.PaddingRight = UDim.new(0, 28)
+    bgPad.PaddingTop = UDim.new(0, 24)
+    bgPad.PaddingBottom = UDim.new(0, 24)
+    bgPad.Parent = bg
 
     local content = Instance.new("Frame")
-    content.Size = UDim2.new(0, 420, 0, 0)
-    content.Position = UDim2.fromScale(0.5, 0.5)
-    content.AnchorPoint = Vector2.new(0.5, 0.5)
+    content.Size = UDim2.new(1, 0, 0, 0)
     content.BackgroundTransparency = 1
     content.AutomaticSize = Enum.AutomaticSize.Y
     content.Parent = bg
@@ -289,14 +306,14 @@ local function showKeyGate()
     mainLayout.Parent = content
 
     local closeBtn = Instance.new("TextButton")
-    closeBtn.Size = UDim2.fromOffset(36, 36)
-    closeBtn.Position = UDim2.new(1, -20, 0, 20)
+    closeBtn.Size = UDim2.fromOffset(28, 28)
+    closeBtn.Position = UDim2.new(1, 16, 0, -12)
     closeBtn.AnchorPoint = Vector2.new(1, 0)
     closeBtn.BackgroundColor3 = COL.surface
     closeBtn.BorderSizePixel = 0
     closeBtn.Text = "X"
     closeBtn.TextColor3 = COL.textDim
-    closeBtn.TextSize = 14
+    closeBtn.TextSize = 12
     closeBtn.Font = Enum.Font.GothamBold
     closeBtn.AutoButtonColor = false
     closeBtn.Parent = bg
