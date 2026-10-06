@@ -490,6 +490,12 @@ local function showKeyGate()
     provListLayout.Padding = UDim.new(0, 10)
     provListLayout.Parent = provList
 
+    -- Provider button palette: subtle illumination, never color fills
+    local BTN_BG       = Color3.fromRGB(10, 10, 10)
+    local BTN_BG_HOV   = Color3.fromRGB(22, 22, 25)
+    local BTN_LINE     = Color3.fromRGB(40, 40, 40)
+    local BTN_LINE_HOV = Color3.fromRGB(80, 80, 80)
+
     for i, prov in ipairs(CFG.PROVIDERS) do
         local provCard = Instance.new("Frame")
         provCard.Size = UDim2.new(1, 0, 0, 0)
@@ -515,7 +521,7 @@ local function showKeyGate()
 
         provCard.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseMovement then
-                tween(cardStroke, {Color = Color3.fromRGB(82, 86, 90)})
+                tween(cardStroke, {Color = BTN_LINE_HOV})
                 tween(provCard, {BackgroundColor3 = Color3.fromRGB(20, 20, 20)})
             end
         end)
@@ -561,7 +567,7 @@ local function showKeyGate()
             local b = Instance.new("TextButton")
             b.Size = UDim2.new(width, 0, 1, 0)
             b.Position = UDim2.new(xPos, 0, 0, 0)
-            b.BackgroundColor3 = COL.input
+            b.BackgroundColor3 = BTN_BG
             b.BorderSizePixel = 0
             b.Text = label
             b.TextColor3 = COL.textDim
@@ -570,7 +576,7 @@ local function showKeyGate()
             b.AutoButtonColor = false
             b.Parent = btnRow
             makeCorner(b, 6)
-            local s = makeStroke(b, COL.border)
+            local s = makeStroke(b, BTN_LINE)
             return b, s
         end
 
@@ -580,13 +586,13 @@ local function showKeyGate()
         local busy24 = false
         btn24.MouseEnter:Connect(function()
             if busy24 then return end
-            tween(btn24, {BackgroundColor3 = COL.borderHi, TextColor3 = COL.text})
-            tween(btn24Stroke, {Color = COL.accent})
+            tween(btn24, {BackgroundColor3 = BTN_BG_HOV, TextColor3 = COL.text})
+            tween(btn24Stroke, {Color = BTN_LINE_HOV})
         end)
         btn24.MouseLeave:Connect(function()
             if busy24 then return end
-            tween(btn24, {BackgroundColor3 = COL.input, TextColor3 = COL.textDim})
-            tween(btn24Stroke, {Color = COL.border})
+            tween(btn24, {BackgroundColor3 = BTN_BG, TextColor3 = COL.textDim})
+            tween(btn24Stroke, {Color = BTN_LINE})
         end)
 
         btn24.MouseButton1Click:Connect(function()
@@ -605,9 +611,9 @@ local function showKeyGate()
                     status.Text = "Failed to create token. Try again."
                     task.wait(2)
                     btn24.Text = "24h \194\183 1 Step"
-                    btn24.BackgroundColor3 = COL.input
+                    btn24.BackgroundColor3 = BTN_BG
                     btn24.TextColor3 = COL.textDim
-                    btn24Stroke.Color = COL.border
+                    btn24Stroke.Color = BTN_LINE
                     busy24 = false
                     return
                 end
@@ -633,9 +639,9 @@ local function showKeyGate()
                     status.Text = "Failed to generate link. Try again."
                     task.wait(2)
                     btn24.Text = "24h \194\183 1 Step"
-                    btn24.BackgroundColor3 = COL.input
+                    btn24.BackgroundColor3 = BTN_BG
                     btn24.TextColor3 = COL.textDim
-                    btn24Stroke.Color = COL.border
+                    btn24Stroke.Color = BTN_LINE
                 end
                 busy24 = false
             end)
@@ -647,17 +653,17 @@ local function showKeyGate()
 
         btn48.MouseEnter:Connect(function()
             if busy48 then return end
-            tween(btn48, {BackgroundColor3 = COL.borderHi, TextColor3 = COL.text})
-            tween(btn48Stroke, {Color = COL.accent})
+            tween(btn48, {BackgroundColor3 = BTN_BG_HOV, TextColor3 = COL.text})
+            tween(btn48Stroke, {Color = BTN_LINE_HOV})
         end)
         btn48.MouseLeave:Connect(function()
             if busy48 then return end
             if step1Done then
-                tween(btn48, {BackgroundColor3 = Color3.fromRGB(20, 20, 20), TextColor3 = COL.text})
-                tween(btn48Stroke, {Color = Color3.fromRGB(140, 144, 148)})
+                tween(btn48, {BackgroundColor3 = BTN_BG, TextColor3 = COL.text})
+                tween(btn48Stroke, {Color = BTN_LINE_HOV})
             else
-                tween(btn48, {BackgroundColor3 = COL.input, TextColor3 = COL.textDim})
-                tween(btn48Stroke, {Color = COL.border})
+                tween(btn48, {BackgroundColor3 = BTN_BG, TextColor3 = COL.textDim})
+                tween(btn48Stroke, {Color = BTN_LINE})
             end
         end)
 
@@ -678,9 +684,9 @@ local function showKeyGate()
                     status.Text = "Failed to create token. Try again."
                     task.wait(2)
                     btn48.Text = step1Done and "Step 2 \226\134\146" or "48h \194\183 2 Steps"
-                    btn48.BackgroundColor3 = COL.input
+                    btn48.BackgroundColor3 = BTN_BG
                     btn48.TextColor3 = COL.textDim
-                    btn48Stroke.Color = COL.border
+                    btn48Stroke.Color = BTN_LINE
                     busy48 = false
                     return
                 end
@@ -701,9 +707,9 @@ local function showKeyGate()
                         status.Text = copied and "Link copied! Complete Step 1, then click Step 2." or "Complete Step 1, then click Step 2."
                         step1Done = true
                         btn48.Text = "Step 2 \226\134\146"
-                        btn48.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+                        btn48.BackgroundColor3 = BTN_BG
                         btn48.TextColor3 = COL.text
-                        btn48Stroke.Color = Color3.fromRGB(140, 144, 148)
+                        btn48Stroke.Color = BTN_LINE_HOV
                     else
                         status.TextColor3 = copied and COL.success or COL.textDim
                         status.Text = copied and "Link copied! Paste in your browser." or "Opening link..."
@@ -717,9 +723,9 @@ local function showKeyGate()
                     status.Text = "Failed to generate link. Try again."
                     task.wait(2)
                     btn48.Text = step1Done and "Step 2 \226\134\146" or "48h \194\183 2 Steps"
-                    btn48.BackgroundColor3 = COL.input
+                    btn48.BackgroundColor3 = BTN_BG
                     btn48.TextColor3 = COL.textDim
-                    btn48Stroke.Color = COL.border
+                    btn48Stroke.Color = BTN_LINE
                 end
                 busy48 = false
             end)
