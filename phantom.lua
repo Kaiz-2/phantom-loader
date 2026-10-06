@@ -34,6 +34,23 @@ local CFG = {
     KEY_FILE     = "phantom_hub_key.txt",
 }
 
+--═══════════════ SCRIPT LIBRARY ═══════════════
+-- game = "universal" (shows everywhere) or a placeId (shows only in that game)
+local SCRIPTS = {
+    {
+        name = "Infinite Yield",
+        desc = "Admin command suite",
+        game = "universal",
+        url  = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source",
+    },
+    {
+        name = "Blue Lock Farm",
+        desc = "Auto-farm for Blue Lock",
+        game = 132767904294856,
+        url  = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source",
+    },
+}
+
 --═══════════════ SERVICES ═══════════════
 local Players      = game:GetService("Players")
 local HttpService  = game:GetService("HttpService")
@@ -895,19 +912,63 @@ local tabSettings = Window:Tab({
     Icon = "settings",
 })
 
---═══════════════ SCRIPTS TAB ═══════════════
-tabScripts:Paragraph({
-    Title = "Game Scripts",
-    Desc = 'No scripts configured for "' .. gameInfo.name .. '" yet.',
-    Icon = "file-code",
-})
+--═══════════════ RUN HELPER ═══════════════
+local function runScript(s)
+    WindUI:Notify({ Title = "Phantom", Content = "Loading " .. s.name .. "...", Duration = 2, Icon = "download" })
+    local ok, err = pcall(function()
+        return loadstring(game:HttpGet(s.url))()
+    end)
+    if ok then
+        WindUI:Notify({ Title = "Phantom", Content = s.name .. " loaded", Duration = 3, Icon = "check" })
+    else
+        WindUI:Notify({ Title = "Phantom", Content = "Failed: " .. tostring(err):sub(1, 60), Duration = 5, Icon = "x" })
+    end
+end
 
---═══════════════ ALL SCRIPTS TAB ═══════════════
+--═══════════════ SCRIPTS TAB (compatible with this game) ═══════════════
+local compatible = {}
+for _, s in ipairs(SCRIPTS) do
+    if s.game == "universal" or s.game == game.PlaceId then
+        table.insert(compatible, s)
+    end
+end
+
+if #compatible == 0 then
+    tabScripts:Paragraph({
+        Title = "No compatible scripts",
+        Desc = 'Nothing curated for "' .. gameInfo.name .. '" yet.',
+        Icon = "file-code",
+    })
+else
+    tabScripts:Paragraph({
+        Title = "Compatible with " .. gameInfo.name,
+        Desc = #compatible .. (#compatible == 1 and " script available" or " scripts available"),
+        Icon = "circle-check",
+    })
+    for _, s in ipairs(compatible) do
+        tabScripts:Button({
+            Title = s.name,
+            Desc = s.desc .. (s.game == "universal" and "  ·  Universal" or ""),
+            Icon = "play",
+            Callback = function() runScript(s) end,
+        })
+    end
+end
+
+--═══════════════ ALL SCRIPTS TAB (full library) ═══════════════
 tabAllScripts:Paragraph({
     Title = "Script Library",
-    Desc = "Curated scripts for popular games will appear here.",
+    Desc = #SCRIPTS .. (#SCRIPTS == 1 and " script total" or " scripts total"),
     Icon = "folder-open",
 })
+for _, s in ipairs(SCRIPTS) do
+    tabAllScripts:Button({
+        Title = s.name,
+        Desc = s.desc .. "  ·  " .. (s.game == "universal" and "Universal" or ("Place " .. tostring(s.game))),
+        Icon = "play",
+        Callback = function() runScript(s) end,
+    })
+end
 
 --═══════════════ INFO TAB ═══════════════
 tabInfo:Paragraph({
