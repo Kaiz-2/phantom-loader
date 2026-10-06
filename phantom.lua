@@ -64,8 +64,8 @@ local SCRIPTS = {
     { name = "Dress to Impress", desc = "Snowy Hub - needs key", game = 15101393044,
       url = "https://rawscripts.net/raw/Dress-To-Impress-Snowy-Hub-or-Auto-Farm-Troll-Speed-Anti-AFK-Fling-and-More-225635" },
 
-    { name = "Blue Lock Farm", desc = "Auto-farm", game = 132767904294856,
-      url = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source" },
+    { name = "Blue Lock Farm", desc = "Ouroboros - auto-farm", game = 132767904294856,
+      url = "https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua" },
 }
 
 --═══════════════ SERVICES ═══════════════
