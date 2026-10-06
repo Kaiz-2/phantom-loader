@@ -24,6 +24,7 @@ local CFG = {
             name     = "LootLabs",
             logo     = "rbxassetid://102357888982176",
             apiMode  = true,
+            only24h  = true,
         },
     },
 
@@ -580,8 +581,7 @@ local function showKeyGate()
             return b, s
         end
 
-        local btn24, btn24Stroke = makeProvBtn("24h \194\183 1 Step", 0, 0.48)
-        local btn48, btn48Stroke = makeProvBtn("48h \194\183 2 Steps", 0.52, 0.48)
+        local btn24, btn24Stroke = makeProvBtn("24h \194\183 1 Step", 0, prov.only24h and 1 or 0.48)
 
         local busy24 = false
         btn24.MouseEnter:Connect(function()
@@ -647,6 +647,8 @@ local function showKeyGate()
             end)
         end)
 
+        if not prov.only24h then
+        local btn48, btn48Stroke = makeProvBtn("48h \194\183 2 Steps", 0.52, 0.48)
         local busy48 = false
         local step1Done = false
         local token48 = nil
@@ -730,6 +732,7 @@ local function showKeyGate()
                 busy48 = false
             end)
         end)
+        end
     end
 
     makeSpacer(content, 24, 18)
