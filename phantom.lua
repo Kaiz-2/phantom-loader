@@ -253,44 +253,58 @@ local function showKeyGate()
     gui.IgnoreGuiInset = true
     gui.Parent = guiParent
 
+    local TweenService = game:GetService("TweenService")
+    local TWEEN_FAST = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local TWEEN_MED  = TweenInfo.new(0.3,  Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local TWEEN_SLOW = TweenInfo.new(0.5,  Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+
+    local function tween(obj, props, info)
+        TweenService:Create(obj, info or TWEEN_FAST, props):Play()
+    end
+
     local COL = {
-        bg       = Color3.fromRGB(14, 10, 18),
-        surface  = Color3.fromRGB(29, 17, 24),
-        border   = Color3.fromRGB(50, 29, 41),
-        borderHi = Color3.fromRGB(75, 45, 62),
-        input    = Color3.fromRGB(24, 14, 20),
-        text     = Color3.fromRGB(248, 232, 240),
-        textDim  = Color3.fromRGB(150, 112, 132),
-        textMute = Color3.fromRGB(70, 50, 60),
+        bg       = Color3.fromRGB(29, 32, 33),
+        surface  = Color3.fromRGB(40, 40, 40),
+        border   = Color3.fromRGB(60, 56, 54),
+        borderHi = Color3.fromRGB(80, 73, 69),
+        input    = Color3.fromRGB(29, 32, 33),
+        text     = Color3.fromRGB(235, 219, 178),
+        textDim  = Color3.fromRGB(168, 153, 132),
+        textMute = Color3.fromRGB(102, 92, 84),
         accent   = CFG.ACCENT,
-        success  = Color3.fromRGB(70, 200, 110),
-        error    = Color3.fromRGB(230, 70, 70),
+        success  = Color3.fromRGB(184, 187, 38),
+        error    = Color3.fromRGB(251, 73, 52),
     }
 
     local overlay = Instance.new("Frame")
     overlay.Size = UDim2.fromScale(1, 1)
     overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    overlay.BackgroundTransparency = 0.4
+    overlay.BackgroundTransparency = 1
     overlay.BorderSizePixel = 0
     overlay.Parent = gui
+    tween(overlay, {BackgroundTransparency = 0.5}, TWEEN_MED)
 
     local bg = Instance.new("Frame")
-    bg.Size = UDim2.new(0, 450, 0, 0)
+    bg.Size = UDim2.new(0, 440, 0, 0)
     bg.AutomaticSize = Enum.AutomaticSize.Y
     bg.Position = UDim2.fromScale(0.5, 0.5)
     bg.AnchorPoint = Vector2.new(0.5, 0.5)
     bg.BackgroundColor3 = COL.bg
-    bg.BackgroundTransparency = 0
+    bg.BackgroundTransparency = 0.02
     bg.BorderSizePixel = 0
     bg.Parent = gui
-    makeCorner(bg, 14)
+    makeCorner(bg, 16)
     makeStroke(bg, COL.border)
 
+    bg.Position = UDim2.new(0.5, 0, 0.5, 30)
+    bg.BackgroundTransparency = 1
+    tween(bg, {Position = UDim2.fromScale(0.5, 0.5), BackgroundTransparency = 0.02}, TWEEN_SLOW)
+
     local bgPad = Instance.new("UIPadding")
-    bgPad.PaddingLeft = UDim.new(0, 28)
-    bgPad.PaddingRight = UDim.new(0, 28)
-    bgPad.PaddingTop = UDim.new(0, 24)
-    bgPad.PaddingBottom = UDim.new(0, 24)
+    bgPad.PaddingLeft = UDim.new(0, 30)
+    bgPad.PaddingRight = UDim.new(0, 30)
+    bgPad.PaddingTop = UDim.new(0, 28)
+    bgPad.PaddingBottom = UDim.new(0, 28)
     bgPad.Parent = bg
 
     local content = Instance.new("Frame")
@@ -306,27 +320,24 @@ local function showKeyGate()
     mainLayout.Parent = content
 
     local closeBtn = Instance.new("TextButton")
-    closeBtn.Size = UDim2.fromOffset(28, 28)
-    closeBtn.Position = UDim2.new(1, 16, 0, -12)
+    closeBtn.Size = UDim2.fromOffset(30, 30)
+    closeBtn.Position = UDim2.new(1, 18, 0, -16)
     closeBtn.AnchorPoint = Vector2.new(1, 0)
     closeBtn.BackgroundColor3 = COL.surface
     closeBtn.BorderSizePixel = 0
-    closeBtn.Text = "X"
-    closeBtn.TextColor3 = COL.textDim
-    closeBtn.TextSize = 12
+    closeBtn.Text = "\195\151"
+    closeBtn.TextColor3 = COL.textMute
+    closeBtn.TextSize = 16
     closeBtn.Font = Enum.Font.GothamBold
     closeBtn.AutoButtonColor = false
     closeBtn.Parent = bg
-    makeCorner(closeBtn, 10)
-    makeStroke(closeBtn, COL.border)
+    makeCorner(closeBtn, 8)
 
     closeBtn.MouseEnter:Connect(function()
-        closeBtn.BackgroundColor3 = COL.borderHi
-        closeBtn.TextColor3 = COL.text
+        tween(closeBtn, {BackgroundColor3 = COL.error, TextColor3 = COL.text})
     end)
     closeBtn.MouseLeave:Connect(function()
-        closeBtn.BackgroundColor3 = COL.surface
-        closeBtn.TextColor3 = COL.textDim
+        tween(closeBtn, {BackgroundColor3 = COL.surface, TextColor3 = COL.textMute})
     end)
     local dismissed = false
     closeBtn.MouseButton1Click:Connect(function()
@@ -335,17 +346,17 @@ local function showKeyGate()
     end)
 
     local keyHeading = Instance.new("TextLabel")
-    keyHeading.Size = UDim2.new(1, 0, 0, 24)
+    keyHeading.Size = UDim2.new(1, 0, 0, 26)
     keyHeading.BackgroundTransparency = 1
     keyHeading.Text = "Enter your access key"
     keyHeading.TextColor3 = COL.text
-    keyHeading.TextSize = 16
+    keyHeading.TextSize = 18
     keyHeading.Font = Enum.Font.GothamBold
     keyHeading.TextXAlignment = Enum.TextXAlignment.Left
     keyHeading.LayoutOrder = 1
     keyHeading.Parent = content
 
-    makeSpacer(content, 4, 2)
+    makeSpacer(content, 6, 2)
 
     local keySub = Instance.new("TextLabel")
     keySub.Size = UDim2.new(1, 0, 0, 16)
@@ -358,10 +369,10 @@ local function showKeyGate()
     keySub.LayoutOrder = 3
     keySub.Parent = content
 
-    makeSpacer(content, 16, 4)
+    makeSpacer(content, 18, 4)
 
     local inputFrame = Instance.new("Frame")
-    inputFrame.Size = UDim2.new(1, 0, 0, 42)
+    inputFrame.Size = UDim2.new(1, 0, 0, 44)
     inputFrame.BackgroundColor3 = COL.input
     inputFrame.BorderSizePixel = 0
     inputFrame.LayoutOrder = 5
@@ -383,10 +394,12 @@ local function showKeyGate()
     textBox.Parent = inputFrame
 
     textBox.Focused:Connect(function()
-        inputStroke.Color = COL.accent
+        tween(inputStroke, {Color = COL.accent})
+        tween(inputFrame, {BackgroundColor3 = Color3.fromRGB(35, 38, 39)})
     end)
     textBox.FocusLost:Connect(function()
-        inputStroke.Color = COL.border
+        tween(inputStroke, {Color = COL.border})
+        tween(inputFrame, {BackgroundColor3 = COL.input})
     end)
 
     makeSpacer(content, 10, 6)
@@ -405,7 +418,7 @@ local function showKeyGate()
     makeSpacer(content, 6, 8)
 
     local verifyBtn = Instance.new("TextButton")
-    verifyBtn.Size = UDim2.new(1, 0, 0, 42)
+    verifyBtn.Size = UDim2.new(1, 0, 0, 44)
     verifyBtn.BackgroundColor3 = COL.accent
     verifyBtn.BorderSizePixel = 0
     verifyBtn.Text = "Verify Key"
@@ -418,16 +431,12 @@ local function showKeyGate()
     makeCorner(verifyBtn, 10)
 
     local verifyDefault = COL.accent
-    local verifyHover = Color3.fromRGB(
-        math.min(255, math.floor(COL.accent.R * 255 * 1.15)),
-        math.min(255, math.floor(COL.accent.G * 255 * 1.15)),
-        math.min(255, math.floor(COL.accent.B * 255 * 1.15))
-    )
+    local verifyHover = Color3.fromRGB(150, 100, 255)
     verifyBtn.MouseEnter:Connect(function()
-        verifyBtn.BackgroundColor3 = verifyHover
+        tween(verifyBtn, {BackgroundColor3 = verifyHover})
     end)
     verifyBtn.MouseLeave:Connect(function()
-        verifyBtn.BackgroundColor3 = verifyDefault
+        tween(verifyBtn, {BackgroundColor3 = verifyDefault})
     end)
 
     makeSpacer(content, 6, 10)
@@ -504,14 +513,14 @@ local function showKeyGate()
 
         provCard.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseMovement then
-                cardStroke.Color = COL.borderHi
-                provCard.BackgroundColor3 = Color3.fromRGB(34, 20, 28)
+                tween(cardStroke, {Color = COL.borderHi})
+                tween(provCard, {BackgroundColor3 = Color3.fromRGB(50, 48, 47)})
             end
         end)
         provCard.InputEnded:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseMovement then
-                cardStroke.Color = COL.border
-                provCard.BackgroundColor3 = COL.surface
+                tween(cardStroke, {Color = COL.border})
+                tween(provCard, {BackgroundColor3 = COL.surface})
             end
         end)
 
@@ -569,15 +578,13 @@ local function showKeyGate()
         local busy24 = false
         btn24.MouseEnter:Connect(function()
             if busy24 then return end
-            btn24.BackgroundColor3 = COL.borderHi
-            btn24.TextColor3 = COL.text
-            btn24Stroke.Color = COL.accent
+            tween(btn24, {BackgroundColor3 = COL.borderHi, TextColor3 = COL.text})
+            tween(btn24Stroke, {Color = COL.accent})
         end)
         btn24.MouseLeave:Connect(function()
             if busy24 then return end
-            btn24.BackgroundColor3 = COL.input
-            btn24.TextColor3 = COL.textDim
-            btn24Stroke.Color = COL.border
+            tween(btn24, {BackgroundColor3 = COL.input, TextColor3 = COL.textDim})
+            tween(btn24Stroke, {Color = COL.border})
         end)
 
         btn24.MouseButton1Click:Connect(function()
@@ -638,20 +645,17 @@ local function showKeyGate()
 
         btn48.MouseEnter:Connect(function()
             if busy48 then return end
-            btn48.BackgroundColor3 = COL.borderHi
-            btn48.TextColor3 = COL.text
-            btn48Stroke.Color = COL.accent
+            tween(btn48, {BackgroundColor3 = COL.borderHi, TextColor3 = COL.text})
+            tween(btn48Stroke, {Color = COL.accent})
         end)
         btn48.MouseLeave:Connect(function()
             if busy48 then return end
             if step1Done then
-                btn48.BackgroundColor3 = Color3.fromRGB(20, 18, 35)
-                btn48.TextColor3 = COL.accent
-                btn48Stroke.Color = COL.accent
+                tween(btn48, {BackgroundColor3 = Color3.fromRGB(35, 33, 45), TextColor3 = COL.accent})
+                tween(btn48Stroke, {Color = COL.accent})
             else
-                btn48.BackgroundColor3 = COL.input
-                btn48.TextColor3 = COL.textDim
-                btn48Stroke.Color = COL.border
+                tween(btn48, {BackgroundColor3 = COL.input, TextColor3 = COL.textDim})
+                tween(btn48Stroke, {Color = COL.border})
             end
         end)
 
