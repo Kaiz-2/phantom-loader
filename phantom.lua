@@ -132,6 +132,7 @@ local function verifyKey(key)
     if not okJ or type(data) ~= "table" or #data == 0 then return false end
 
     local row = data[1]
+    if row.status and row.status ~= "active" then return false end
     local exp = parseISO(row.expires_at)
     if not exp then return false end
     if exp <= utcNow() then return false end
