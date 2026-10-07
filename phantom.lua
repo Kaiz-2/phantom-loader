@@ -930,23 +930,35 @@ local tabSettings = Window:Tab({
 })
 
 --═══════════════ RUN HELPER ═══════════════
+-- The hub is only a catalog. On execute we fetch + compile the loadstring (so
+-- we can report errors while the hub is still up), then run it DIRECTLY in its
+-- own thread — exactly as if the user pasted it into their executor — and close
+-- the hub so only the executed script remains.
 local function runScript(s)
     WindUI:Notify({ Title = "Phantom", Content = "Loading " .. s.name .. "...", Duration = 2, Icon = "download" })
-    local ok, err = pcall(function()
-        local src = game:HttpGet(s.url)
-        if type(src) ~= "string" or #src == 0 then error("empty response", 0) end
-        local fn, lerr = loadstring(src)
-        if not fn then error(lerr or "compile error", 0) end
-        return fn()
-    end)
-    if ok then
-        WindUI:Notify({ Title = "Phantom", Content = s.name .. " loaded — closing hub", Duration = 3, Icon = "check" })
-        -- script executed: tear down Phantom so only the loaded script's UI remains
-        task.wait(0.6)
-        pcall(function() Window:Destroy() end)
-    else
-        WindUI:Notify({ Title = "Phantom", Content = "Failed: " .. tostring(err):sub(1, 70), Duration = 5, Icon = "x" })
+
+    local src
+    local okFetch = pcall(function() src = game:HttpGet(s.url) end)
+    if not okFetch or type(src) ~= "string" or #src == 0 then
+        WindUI:Notify({ Title = "Phantom", Content = "Failed to fetch " .. s.name, Duration = 5, Icon = "x" })
+        return
     end
+
+    local fn, lerr = loadstring(src)
+    if not fn then
+        WindUI:Notify({ Title = "Phantom", Content = "Compile error: " .. tostring(lerr):sub(1, 60), Duration = 5, Icon = "x" })
+        return
+    end
+
+    -- direct, independent execution (its own thread, in the executor env)
+    task.spawn(function()
+        local ok, err = pcall(fn)
+        if not ok then warn("[Phantom] " .. s.name .. " runtime error: " .. tostring(err)) end
+    end)
+
+    WindUI:Notify({ Title = "Phantom", Content = s.name .. " executed", Duration = 2, Icon = "check" })
+    task.wait(0.4)
+    pcall(function() Window:Destroy() end)
 end
 
 --═══════════════ SCRIPTS TAB (compatible with this game) ═══════════════
