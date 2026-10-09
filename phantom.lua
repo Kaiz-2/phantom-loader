@@ -9,8 +9,6 @@ local CFG = {
     SUPABASE_KEY = "sb_publishable_HXKj5KRyIc3oc7CePaEY5w_9zYWXt5P",
     TABLE        = "Keys",
 
-    LOOTLABS_KEY = "d78147882b52d09a32e23ff2af2ad8e882f52921a37d90e43c01c2b67c7a6b54",
-
     PROVIDERS = {
         {
             id        = "workink",
@@ -18,13 +16,6 @@ local CFG = {
             logo      = "rbxassetid://100851789389252",
             baseUrl   = "https://work.ink/32gE/phantom",
             keySystem = true,
-        },
-        {
-            id       = "lootlabs",
-            name     = "LootLabs",
-            logo     = "rbxassetid://102357888982176",
-            apiMode  = true,
-            only24h  = true,
         },
     },
 
@@ -152,44 +143,6 @@ local function openLink(url)
     end
     pcall(function() GuiService:OpenBrowserWindow(url) end)
     return copied
-end
-
-local function createPendingToken(durationHours)
-    if not httpReq then return nil end
-    local ok, res = pcall(function()
-        return httpReq({
-            Url = CFG.SUPABASE_URL .. "/rest/v1/rpc/create_pending_token",
-            Method = "POST",
-            Headers = sbHeaders(),
-            Body = HttpService:JSONEncode({ duration_hours = durationHours }),
-        })
-    end)
-    if not ok or not res or (res.StatusCode and res.StatusCode >= 400) then return nil end
-    local okJ, data = pcall(function()
-        return HttpService:JSONDecode(res.Body)
-    end)
-    if not okJ or type(data) ~= "table" then return nil end
-    return data.token
-end
-
-local function createLootLabsLink(destinationUrl)
-    if not httpReq then return nil end
-    local url = "https://creators.lootlabs.gg/api/public/content_locker"
-        .. "?api_token=" .. CFG.LOOTLABS_KEY
-        .. "&title=Phantom"
-        .. "&url=" .. HttpService:UrlEncode(destinationUrl)
-        .. "&tier_id=1"
-        .. "&number_of_tasks=2"
-        .. "&theme=5"
-    local ok, res = pcall(function()
-        return httpReq({ Url = url, Method = "GET" })
-    end)
-    if not ok or not res or (res.StatusCode and res.StatusCode >= 400) then return nil end
-    local okJ, data = pcall(function()
-        return HttpService:JSONDecode(res.Body)
-    end)
-    if not okJ or type(data) ~= "table" or type(data.message) ~= "table" or not data.message[1] then return nil end
-    return data.message[1].loot_url
 end
 
 local function createWorkinkOverride(baseUrl, destinationUrl)
@@ -626,27 +579,8 @@ local function showKeyGate()
             status.Text = ""
 
             task.spawn(function()
-                local token = createPendingToken(24)
-                if not token then
-                    btn24.TextColor3 = COL.error
-                    status.TextColor3 = COL.error
-                    status.Text = "Failed to create token. Try again."
-                    task.wait(2)
-                    btn24.Text = "24h \194\183 1 Step"
-                    btn24.BackgroundColor3 = BTN_BG
-                    btn24.TextColor3 = COL.textDim
-                    btn24Stroke.Color = BTN_LINE
-                    busy24 = false
-                    return
-                end
-
-                local redirect = "https://phantom-key-gilt.vercel.app/phantom?token=" .. token .. "&step=2&provider=" .. prov.id
-                local url
-                if prov.keySystem then
-                    url = createWorkinkOverride(prov.baseUrl, redirect)
-                elseif prov.apiMode then
-                    url = createLootLabsLink(redirect)
-                end
+                local redirect = "https://phantom-key-gilt.vercel.app/phantom?hours=24"
+                local url = createWorkinkOverride(prov.baseUrl, redirect)
 
                 if url then
                     local copied = openLink(url)
@@ -673,7 +607,6 @@ local function showKeyGate()
         local btn48, btn48Stroke = makeProvBtn("48h \194\183 2 Steps", 0.52, 0.48)
         local busy48 = false
         local step1Done = false
-        local token48 = nil
 
         btn48.MouseEnter:Connect(function()
             if busy48 then return end
@@ -700,29 +633,9 @@ local function showKeyGate()
             status.Text = ""
 
             task.spawn(function()
-                if not token48 then
-                    token48 = createPendingToken(48)
-                end
-                if not token48 then
-                    status.TextColor3 = COL.error
-                    status.Text = "Failed to create token. Try again."
-                    task.wait(2)
-                    btn48.Text = step1Done and "Step 2 \226\134\146" or "48h \194\183 2 Steps"
-                    btn48.BackgroundColor3 = BTN_BG
-                    btn48.TextColor3 = COL.textDim
-                    btn48Stroke.Color = BTN_LINE
-                    busy48 = false
-                    return
-                end
-
                 local stepNum = step1Done and 2 or 1
-                local redirect = "https://phantom-key-gilt.vercel.app/phantom?token=" .. token48 .. "&step=" .. stepNum .. "&provider=" .. prov.id
-                local url
-                if prov.keySystem then
-                    url = createWorkinkOverride(prov.baseUrl, redirect)
-                elseif prov.apiMode then
-                    url = createLootLabsLink(redirect)
-                end
+                local redirect = "https://phantom-key-gilt.vercel.app/phantom?hours=48&step=" .. stepNum
+                local url = createWorkinkOverride(prov.baseUrl, redirect)
 
                 if url then
                     local copied = openLink(url)
