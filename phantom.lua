@@ -112,16 +112,21 @@ end
 
 local keyExpiry = nil
 
+-- Verification goes through the verify_key RPC (SECURITY DEFINER) so the public
+-- publishable key never touches the Keys table directly. The server checks
+-- status/expiry, binds HWID on first use, and returns only {valid, expires_at}.
 local function verifyKey(key)
     if not httpReq then return false end
     key = tostring(key or ""):gsub("^%s+", ""):gsub("%s+$", "")
     if key == "" then return false end
 
-    local url = CFG.SUPABASE_URL .. "/rest/v1/" .. CFG.TABLE
-        .. "?key=eq." .. HttpService:UrlEncode(key) .. "&select=*"
-
     local ok, res = pcall(function()
-        return httpReq({ Url = url, Method = "GET", Headers = sbHeaders() })
+        return httpReq({
+            Url = CFG.SUPABASE_URL .. "/rest/v1/rpc/verify_key",
+            Method = "POST",
+            Headers = sbHeaders(),
+            Body = HttpService:JSONEncode({ p_key = key, p_hwid = HWID }),
+        })
     end)
     if not ok or not res then return false end
     if res.StatusCode and res.StatusCode >= 400 then return false end
@@ -129,30 +134,12 @@ local function verifyKey(key)
     local okJ, data = pcall(function()
         return HttpService:JSONDecode(res.Body)
     end)
-    if not okJ or type(data) ~= "table" or #data == 0 then return false end
+    if not okJ or type(data) ~= "table" then return false end
 
-    local row = data[1]
-    if row.status and row.status ~= "active" then return false end
-    local exp = parseISO(row.expires_at)
-    if not exp then return false end
-    if exp <= utcNow() then return false end
+    local row = data[1] or data
+    if type(row) ~= "table" or row.valid ~= true then return false end
 
-    if row.hwid == nil or row.hwid == "" then
-        local pUrl = CFG.SUPABASE_URL .. "/rest/v1/" .. CFG.TABLE
-            .. "?key=eq." .. HttpService:UrlEncode(key)
-        local h2 = sbHeaders()
-        h2["Prefer"] = "return=minimal"
-        pcall(function()
-            httpReq({
-                Url = pUrl, Method = "PATCH", Headers = h2,
-                Body = HttpService:JSONEncode({ hwid = HWID }),
-            })
-        end)
-    elseif row.hwid ~= HWID then
-        return false
-    end
-
-    keyExpiry = exp
+    keyExpiry = parseISO(row.expires_at)
     return true
 end
 
